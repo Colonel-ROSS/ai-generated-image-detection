@@ -26,7 +26,7 @@ The stream 2 and stream 3 encoders are loaded from saved files and kept frozen. 
 - Fake images come from Stable Diffusion 1.5 and StyleGAN3.
 - Split: 70% train, 15% validation, 15% test, shuffled with seed 42.
 
-The datasets are not included in this repository because of their size and licences. The pretrained DnCNN denoiser weights are not included either: download them from the original DnCNN authors and save them as models/pretrained/dncnn.pth. They are all public and can be downloaded from their original sources.
+The datasets are not included in this repository because of their size and licences. The pretrained DnCNN denoiser weights are not included either: download them from the original DnCNN authors and save them as models/pretrained/dncnn.pth. The datasets are public and can be downloaded from their original sources. If dncnn.pth is missing, the denoiser falls back to random weights and prints a warning, so the sensor noise results will not be reproduced.
 
 ## Results
 
