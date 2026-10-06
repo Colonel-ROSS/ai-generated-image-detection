@@ -1,0 +1,159 @@
+{
+  "experiment": "forensynths_evaluation",
+  "checkpoint": "models/checkpoints/streams_23_combined_best.pth",
+  "features_dir": "features_combined",
+  "threshold": 0.1723,
+  "timestamp": "20260609_101256",
+  "n_total": 2600,
+  "n_per_generator": 200,
+  "overall": {
+    "auc": 0.5373,
+    "acc": 0.5231,
+    "ap": 0.5284
+  },
+  "per_generator": {
+    "biggan": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.5369,
+      "acc": 0.53,
+      "ap": 0.5245,
+      "tpr": 0.59,
+      "tnr": 0.47,
+      "errors": 0
+    },
+    "crn": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.5249,
+      "acc": 0.49,
+      "ap": 0.507,
+      "tpr": 0.12,
+      "tnr": 0.86,
+      "errors": 0
+    },
+    "cyclegan": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.5487,
+      "acc": 0.54,
+      "ap": 0.5307,
+      "tpr": 0.7,
+      "tnr": 0.38,
+      "errors": 0
+    },
+    "deepfake": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.5576,
+      "acc": 0.54,
+      "ap": 0.5804,
+      "tpr": 0.65,
+      "tnr": 0.43,
+      "errors": 0
+    },
+    "gaugan": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.5604,
+      "acc": 0.55,
+      "ap": 0.5495,
+      "tpr": 0.46,
+      "tnr": 0.64,
+      "errors": 0
+    },
+    "imle": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.5548,
+      "acc": 0.515,
+      "ap": 0.5455,
+      "tpr": 0.19,
+      "tnr": 0.84,
+      "errors": 0
+    },
+    "progan": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.5066,
+      "acc": 0.5,
+      "ap": 0.5212,
+      "tpr": 0.49,
+      "tnr": 0.51,
+      "errors": 0
+    },
+    "san": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.5242,
+      "acc": 0.51,
+      "ap": 0.5248,
+      "tpr": 0.52,
+      "tnr": 0.5,
+      "errors": 0
+    },
+    "seeingdark": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.4964,
+      "acc": 0.515,
+      "ap": 0.5005,
+      "tpr": 0.49,
+      "tnr": 0.54,
+      "errors": 0
+    },
+    "stargan": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.513,
+      "acc": 0.455,
+      "ap": 0.5144,
+      "tpr": 0.36,
+      "tnr": 0.55,
+      "errors": 0
+    },
+    "stylegan": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.5352,
+      "acc": 0.53,
+      "ap": 0.5309,
+      "tpr": 0.35,
+      "tnr": 0.71,
+      "errors": 0
+    },
+    "stylegan2": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.5877,
+      "acc": 0.59,
+      "ap": 0.5748,
+      "tpr": 0.5,
+      "tnr": 0.68,
+      "errors": 0
+    },
+    "whichfaceisreal": {
+      "n": 200,
+      "n_real": 100,
+      "n_fake": 100,
+      "auc": 0.6038,
+      "acc": 0.535,
+      "ap": 0.6191,
+      "tpr": 0.72,
+      "tnr": 0.35,
+      "errors": 0
+    }
+  }
+}

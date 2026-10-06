@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-06-08T20:42:41.040250",
+  "fingerprint_source": "RAISE-1k D7000 TIFFs",
+  "n_raise_images": 10,
+  "crop_size": [
+    256,
+    256
+  ],
+  "n_real_test": 100,
+  "n_fake_sd": 100,
+  "n_fake_sg3": 50,
+  "real_ncc": {
+    "mean": 0.18262231349945068,
+    "std": 0.1532067358493805
+  },
+  "fake_sd_ncc": {
+    "mean": 0.21607692539691925,
+    "std": 0.1653442680835724
+  },
+  "fake_sg3_ncc": {
+    "mean": 0.31141242384910583,
+    "std": 0.09636664390563965
+  },
+  "auc_real_vs_fake": 0.37906666666666666,
+  "ncc_gap_real_minus_fake": -0.06523311138153076,
+  "verdict": "NO_SIGNAL"
+}

@@ -1,0 +1,37 @@
+{
+  "experiment": "streams_23",
+  "checkpoint": "models/checkpoints/streams_23_full_best.pth",
+  "timestamp": "20260602_131442",
+  "n_samples": 1500,
+  "overall": {
+    "acc": 0.7153,
+    "auc": 0.9172,
+    "ap": 0.9517
+  },
+  "per_generator": {
+    "real": {
+      "n": 500,
+      "n_real": 500,
+      "n_fake": 0,
+      "acc": 0.95,
+      "auc": "nan",
+      "ap": "nan"
+    },
+    "stable_diffusion": {
+      "n": 500,
+      "n_real": 0,
+      "n_fake": 500,
+      "acc": 0.438,
+      "auc": "nan",
+      "ap": "nan"
+    },
+    "stylegan3": {
+      "n": 500,
+      "n_real": 0,
+      "n_fake": 500,
+      "acc": 0.758,
+      "auc": "nan",
+      "ap": "nan"
+    }
+  }
+}

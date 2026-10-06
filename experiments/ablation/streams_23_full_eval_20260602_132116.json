@@ -1,0 +1,100 @@
+{
+  "experiment": "streams_23",
+  "timestamp": "20260602_132116",
+  "test_evaluation": {
+    "checkpoint": "models/checkpoints/streams_23_full_best.pth",
+    "streams": "23",
+    "n_samples": 12009,
+    "acc": 0.8501,
+    "auc": 0.8624,
+    "ap": 0.6781,
+    "confusion_matrix": [
+      [
+        9113,
+        382
+      ],
+      [
+        1418,
+        1096
+      ]
+    ]
+  },
+  "robustness": {
+    "baseline_clean": {
+      "acc": 0.7075,
+      "auc": 0.8969
+    },
+    "jpeg": {
+      "95": {
+        "acc": 0.71,
+        "auc": 0.8976,
+        "acc_drop": -0.0025,
+        "auc_drop": -0.0007
+      },
+      "75": {
+        "acc": 0.7125,
+        "auc": 0.8962,
+        "acc_drop": -0.005,
+        "auc_drop": 0.0007
+      },
+      "50": {
+        "acc": 0.7075,
+        "auc": 0.896,
+        "acc_drop": 0.0,
+        "auc_drop": 0.001
+      },
+      "30": {
+        "acc": 0.7025,
+        "auc": 0.8927,
+        "acc_drop": 0.005,
+        "auc_drop": 0.0042
+      }
+    },
+    "blur": {
+      "1": {
+        "acc": 0.71,
+        "auc": 0.849,
+        "acc_drop": -0.0025,
+        "auc_drop": 0.0479
+      },
+      "2": {
+        "acc": 0.5925,
+        "auc": 0.7567,
+        "acc_drop": 0.115,
+        "auc_drop": 0.1402
+      },
+      "3": {
+        "acc": 0.53,
+        "auc": 0.6206,
+        "acc_drop": 0.1775,
+        "auc_drop": 0.2763
+      },
+      "4": {
+        "acc": 0.4975,
+        "auc": 0.522,
+        "acc_drop": 0.21,
+        "auc_drop": 0.3749
+      }
+    },
+    "resize": {
+      "0.5": {
+        "acc": 0.7675,
+        "auc": 0.8602,
+        "acc_drop": -0.06,
+        "auc_drop": 0.0368
+      },
+      "0.75": {
+        "acc": 0.7425,
+        "auc": 0.8741,
+        "acc_drop": -0.035,
+        "auc_drop": 0.0228
+      },
+      "1.5": {
+        "acc": 0.725,
+        "auc": 0.8873,
+        "acc_drop": -0.0175,
+        "auc_drop": 0.0096
+      }
+    }
+  }
+}

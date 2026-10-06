@@ -1,0 +1,19 @@
+{
+  "checkpoint": "/mnt/d/ai_image_detector/models/checkpoints/streams_23_balanced_best.pth",
+  "streams": "23",
+  "split": "test",
+  "n_samples": 26299,
+  "acc": 0.8046,
+  "auc": 0.8736,
+  "ap": 0.634,
+  "confusion_matrix": [
+    [
+      18097,
+      4204
+    ],
+    [
+      934,
+      3064
+    ]
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "checkpoint": "/mnt/d/ai_image_detector/models/checkpoints/streams_23_combined_best.pth",
+  "features_dir": "/mnt/d/ai_image_detector/features_combined",
+  "n_samples": 175331,
+  "n_real": 148831,
+  "n_fake": 26500,
+  "full_set_auc": 0.8853,
+  "optimal_threshold": 0.1723,
+  "at_optimal": {
+    "TPR": 0.7819,
+    "TNR": 0.8206,
+    "balanced_acc": 0.8012
+  },
+  "at_0_5": {
+    "acc": 0.8904
+  }
+}

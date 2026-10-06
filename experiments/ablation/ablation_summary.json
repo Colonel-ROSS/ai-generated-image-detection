@@ -1,0 +1,65 @@
+{
+  "streams_1_only": {
+    "label": "F1 only (PRNU)",
+    "streams": "1",
+    "in_dim": 128,
+    "test_acc": 0.4867,
+    "test_auc": 0.5,
+    "test_ap": 0.4867,
+    "best_val_acc": 0.4967
+  },
+  "streams_2_only": {
+    "label": "F2 only (FFT)",
+    "streams": "2",
+    "in_dim": 256,
+    "test_acc": 0.5633,
+    "test_auc": 0.6029,
+    "test_ap": 0.6067,
+    "best_val_acc": 0.565
+  },
+  "streams_3_only": {
+    "label": "F3 only (NSS)",
+    "streams": "3",
+    "in_dim": 18,
+    "test_acc": 0.605,
+    "test_auc": 0.6242,
+    "test_ap": 0.6274,
+    "best_val_acc": 0.6083
+  },
+  "streams_12": {
+    "label": "F1+F2",
+    "streams": "12",
+    "in_dim": 384,
+    "test_acc": 0.575,
+    "test_auc": 0.5991,
+    "test_ap": 0.5987,
+    "best_val_acc": 0.5717
+  },
+  "streams_13": {
+    "label": "F1+F3",
+    "streams": "13",
+    "in_dim": 146,
+    "test_acc": 0.5883,
+    "test_auc": 0.62,
+    "test_ap": 0.6201,
+    "best_val_acc": 0.605
+  },
+  "streams_23": {
+    "label": "F2+F3",
+    "streams": "23",
+    "in_dim": "?",
+    "test_acc": 0.625,
+    "test_auc": 0.6402830901974738,
+    "test_ap": 0.6435983016941011,
+    "best_val_acc": 0.6033333333333334
+  },
+  "streams_123": {
+    "label": "F1+F2+F3 (full)",
+    "streams": "123",
+    "in_dim": 402,
+    "test_acc": 0.62,
+    "test_auc": 0.6421,
+    "test_ap": 0.65,
+    "best_val_acc": 0.6233
+  }
+}

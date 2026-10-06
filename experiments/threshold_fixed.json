@@ -1,0 +1,13 @@
+{
+  "checkpoint": "/mnt/d/ai_image_detector/models/checkpoints/streams_23_fixed_best.pth",
+  "full_set_auc": 0.8837,
+  "optimal_threshold": 0.196,
+  "at_optimal": {
+    "TPR": 0.8119,
+    "TNR": 0.7873,
+    "balanced_acc": 0.7996
+  },
+  "at_0_5": {
+    "acc": 0.8622
+  }
+}

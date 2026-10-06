@@ -1,0 +1,21 @@
+{
+  "checkpoint": "/mnt/d/ai_image_detector/models/checkpoints/streams_23_balanced_best.pth",
+  "features_dir": "/mnt/d/ai_image_detector/features_combined",
+  "method": "Youden J (argmax balanced_acc) on full 175,331 features",
+  "n_samples": 175331,
+  "n_real": 148831,
+  "n_fake": 26500,
+  "full_set_auc": 0.8924,
+  "optimal_threshold": 0.4806,
+  "at_optimal": {
+    "TPR": 0.816,
+    "TNR": 0.8046,
+    "balanced_acc": 0.8103
+  },
+  "at_0_5": {
+    "balanced_acc": 0.8092,
+    "TPR": 0.8001,
+    "TNR": 0.8184
+  },
+  "note": "WeightedRandomSampler balanced training normalizes threshold from 0.1723 to 0.4806"
+}

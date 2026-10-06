@@ -1,0 +1,100 @@
+{
+  "experiment": "streams_23",
+  "timestamp": "20260531_221456",
+  "test_evaluation": {
+    "checkpoint": "/mnt/d/ai_image_detector/models/checkpoints/streams_23_v2_best.pth",
+    "streams": "23",
+    "n_samples": 1500,
+    "acc": 0.6367,
+    "auc": 0.6892,
+    "ap": 0.6912,
+    "confusion_matrix": [
+      [
+        528,
+        218
+      ],
+      [
+        327,
+        427
+      ]
+    ]
+  },
+  "robustness": {
+    "baseline_clean": {
+      "acc": 0.55,
+      "auc": 0.6214
+    },
+    "jpeg": {
+      "95": {
+        "acc": 0.55,
+        "auc": 0.6208,
+        "acc_drop": 0.0,
+        "auc_drop": 0.0007
+      },
+      "75": {
+        "acc": 0.55,
+        "auc": 0.6195,
+        "acc_drop": 0.0,
+        "auc_drop": 0.002
+      },
+      "50": {
+        "acc": 0.5475,
+        "auc": 0.6173,
+        "acc_drop": 0.0025,
+        "auc_drop": 0.0041
+      },
+      "30": {
+        "acc": 0.55,
+        "auc": 0.6158,
+        "acc_drop": 0.0,
+        "auc_drop": 0.0056
+      }
+    },
+    "blur": {
+      "1": {
+        "acc": 0.5625,
+        "auc": 0.6122,
+        "acc_drop": -0.0125,
+        "auc_drop": 0.0092
+      },
+      "2": {
+        "acc": 0.5675,
+        "auc": 0.6058,
+        "acc_drop": -0.0175,
+        "auc_drop": 0.0156
+      },
+      "3": {
+        "acc": 0.555,
+        "auc": 0.6018,
+        "acc_drop": -0.005,
+        "auc_drop": 0.0196
+      },
+      "4": {
+        "acc": 0.5175,
+        "auc": 0.5877,
+        "acc_drop": 0.0325,
+        "auc_drop": 0.0337
+      }
+    },
+    "resize": {
+      "0.5": {
+        "acc": 0.5575,
+        "auc": 0.6129,
+        "acc_drop": -0.0075,
+        "auc_drop": 0.0085
+      },
+      "0.75": {
+        "acc": 0.5525,
+        "auc": 0.6147,
+        "acc_drop": -0.0025,
+        "auc_drop": 0.0067
+      },
+      "1.5": {
+        "acc": 0.5475,
+        "auc": 0.6181,
+        "acc_drop": 0.0025,
+        "auc_drop": 0.0033
+      }
+    }
+  }
+}

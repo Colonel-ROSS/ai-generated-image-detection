@@ -1,0 +1,200 @@
+{
+  "experiment": "cross_benchmark_marco-willi_cnnspot-small",
+  "dataset": "marco-willi/cnnspot-small",
+  "checkpoint": "models/checkpoints/streams_23_v5b_best.pth",
+  "features_dir": "features_v5",
+  "timestamp": "20260602_032830",
+  "n_samples": 8760,
+  "n_per_source": 200,
+  "overall": {
+    "acc": 0.5531,
+    "auc": 0.5663,
+    "ap": 0.5242
+  },
+  "per_source": {
+    "biggan": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.515,
+      "auc": 0.5194,
+      "ap": 0.5223
+    },
+    "crn": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.4725,
+      "auc": 0.518,
+      "ap": 0.5084
+    },
+    "cyclegan": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.6525,
+      "auc": 0.7069,
+      "ap": 0.6766
+    },
+    "dalle": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.6,
+      "auc": 0.6095,
+      "ap": 0.5584
+    },
+    "deepfake": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.4825,
+      "auc": 0.4767,
+      "ap": 0.5022
+    },
+    "gaugan": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.5375,
+      "auc": 0.5381,
+      "ap": 0.5289
+    },
+    "glide_100_10": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.5175,
+      "auc": 0.5126,
+      "ap": 0.5118
+    },
+    "glide_100_27": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.545,
+      "auc": 0.5563,
+      "ap": 0.5269
+    },
+    "glide_50_27": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.5475,
+      "auc": 0.5396,
+      "ap": 0.5191
+    },
+    "guided": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.5975,
+      "auc": 0.5987,
+      "ap": 0.6004
+    },
+    "imagenet": {
+      "n": 200,
+      "n_real": 200,
+      "n_fake": 0,
+      "acc": 0.575,
+      "auc": null,
+      "ap": null
+    },
+    "imle": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.495,
+      "auc": 0.5381,
+      "ap": 0.5241
+    },
+    "laion": {
+      "n": 200,
+      "n_real": 200,
+      "n_fake": 0,
+      "acc": 0.63,
+      "auc": null,
+      "ap": null
+    },
+    "ldm_100": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.615,
+      "auc": 0.6462,
+      "ap": 0.5965
+    },
+    "ldm_200": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.6125,
+      "auc": 0.638,
+      "ap": 0.5972
+    },
+    "ldm_200_cfg": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.6325,
+      "auc": 0.6599,
+      "ap": 0.6
+    },
+    "progan": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.4975,
+      "auc": 0.5109,
+      "ap": 0.5144
+    },
+    "san": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.55,
+      "auc": 0.554,
+      "ap": 0.5356
+    },
+    "seeingdark": {
+      "n": 360,
+      "n_real": 180,
+      "n_fake": 180,
+      "acc": 0.4917,
+      "auc": 0.5057,
+      "ap": 0.5192
+    },
+    "stargan": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.5275,
+      "auc": 0.5133,
+      "ap": 0.5087
+    },
+    "stylegan": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.5175,
+      "auc": 0.5518,
+      "ap": 0.5515
+    },
+    "stylegan2": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.5575,
+      "auc": 0.6126,
+      "ap": 0.5979
+    },
+    "whichfaceisreal": {
+      "n": 400,
+      "n_real": 200,
+      "n_fake": 200,
+      "acc": 0.595,
+      "auc": 0.6122,
+      "ap": 0.594
+    }
+  }
+}

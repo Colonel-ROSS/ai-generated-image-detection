@@ -1,0 +1,2371 @@
+{
+  "metadata": {
+    "project": "Detecting AI-Generated Images via Physical Sensor Noise and Frequency Domain Forensics",
+    "student": "Musab Humzah Syed",
+    "supervisor": "Dr. Tony Scanlan, University of Limerick",
+    "generated_at": "2026-06-01",
+    "last_updated": "2026-06-11T02:48:42.382596",
+    "dataset": {
+      "real": {
+        "coco_original": 63560,
+        "coco_extra": 54257,
+        "flickr30k": "~31783",
+        "total_real_approx": "~149600"
+      },
+      "fake": {
+        "stable_diffusion_1_5": 16000,
+        "stylegan3": 500,
+        "diffusiondb_sd2": "~10000",
+        "total_fake_approx": "~26500"
+      },
+      "combined_total_approx": "~176100",
+      "class_balance": "~85% real / ~15% fake"
+    },
+    "session": 14
+  },
+  "ablation_study": {
+    "note": "Seven ablation variants evaluated. v4 adds Z-normalisation (std floor 0.01). v5/v5b adds ImageNet-pretrained ResNet-18 backbone. v5b is the definitive best (50 epochs).",
+    "variants": {
+      "F1_only_PRNU": {
+        "streams": "1",
+        "in_dim": 128,
+        "test_acc": 0.4867,
+        "test_auc": 0.5,
+        "test_ap": 0.4867,
+        "note": "AUC=0.5 \u2014 PRNU stream with random encoder fails to learn"
+      },
+      "F2_only_FFT": {
+        "streams": "2",
+        "in_dim": 256,
+        "test_acc": 0.5633,
+        "test_auc": 0.6029,
+        "test_ap": 0.6067
+      },
+      "F3_only_NSS": {
+        "streams": "3",
+        "in_dim": 64,
+        "test_acc": 0.605,
+        "test_auc": 0.6242,
+        "test_ap": 0.6274,
+        "note": "NSS stream outperforms FFT alone"
+      },
+      "F1_F2": {
+        "streams": "12",
+        "in_dim": 384,
+        "test_acc": 0.575,
+        "test_auc": 0.5991,
+        "test_ap": 0.5987,
+        "note": "PRNU degrades FFT performance"
+      },
+      "F1_F3": {
+        "streams": "13",
+        "in_dim": 192,
+        "test_acc": 0.5883,
+        "test_auc": 0.62,
+        "test_ap": 0.6201
+      },
+      "F2_F3_v1": {
+        "streams": "23",
+        "in_dim": 274,
+        "test_acc": 0.625,
+        "test_auc": 0.6403,
+        "test_ap": 0.6436,
+        "note": "v1: NSS passed raw (18-dim) to FusionHead"
+      },
+      "F2_F3_v2_NSSEncoder_fixed": {
+        "streams": "23",
+        "in_dim": 320,
+        "test_acc": 0.6367,
+        "test_auc": 0.6892,
+        "test_ap": 0.6912,
+        "note": "v2: NSSEncoder (18->64 dim projection) added, +4.9pp AUC"
+      },
+      "F2_F3_v3_seed_fixed": {
+        "streams": "23",
+        "in_dim": 320,
+        "test_acc": 0.6387,
+        "test_auc": 0.6855,
+        "test_ap": 0.6897,
+        "note": "v3: encoder seed fixed to 0; comparable to v2"
+      },
+      "F2_F3_v4_normalised": {
+        "streams": "23",
+        "in_dim": 320,
+        "test_acc": 0.7373,
+        "test_auc": 0.8106,
+        "test_ap": 0.8162,
+        "confusion_matrix": [
+          [
+            544,
+            202
+          ],
+          [
+            192,
+            562
+          ]
+        ],
+        "note": "v4: Z-normalisation (std floor 0.01) applied \u2014 +12.7pp AUC over v3",
+        "checkpoint": "models/checkpoints/streams_23_v4_best.pth",
+        "features_dir": "features_v3",
+        "n_per_class": 5000,
+        "limitation": "Random ResNet-18 init \u2014 AUC\u22480.5 on fresh images (encoder mismatch)"
+      },
+      "F2_F3_v5_pretrained_20epochs": {
+        "streams": "23",
+        "in_dim": 320,
+        "test_acc": 0.7713,
+        "test_auc": 0.8497,
+        "test_ap": 0.8545,
+        "note": "v5: ImageNet-pretrained ResNet-18 backbone, 20 epochs \u2014 +3.9pp AUC over v4",
+        "checkpoint": "models/checkpoints/streams_23_v5_best.pth",
+        "features_dir": "features_v5",
+        "n_per_class": 5000
+      },
+      "F2_F3_v5b_pretrained_50epochs": {
+        "streams": "23",
+        "in_dim": 320,
+        "test_acc": 0.7933,
+        "test_auc": 0.8651,
+        "test_ap": 0.8666,
+        "note": "v5b: pretrained backbone, 50 epochs \u2014 +5.4pp AUC over v4, BEST VARIANT",
+        "checkpoint": "models/checkpoints/streams_23_v5b_best.pth",
+        "features_dir": "features_v5",
+        "n_per_class": 5000,
+        "generalisation_auc_fresh_images": 0.9107,
+        "generalisation_acc_fresh_images": 0.8373
+      },
+      "F1_F2_F3_v1": {
+        "streams": "123",
+        "in_dim": 402,
+        "test_acc": 0.62,
+        "test_auc": 0.6421,
+        "test_ap": 0.65,
+        "note": "Full model v1 (unnormalised, ~1000 train samples)"
+      },
+      "F1_F2_F3_v3": {
+        "streams": "123",
+        "in_dim": 448,
+        "test_acc": 0.4867,
+        "test_auc": 0.5775,
+        "test_ap": 0.6068,
+        "note": "v3: 500 samples/class, unnormalised \u2014 poor due to small subset"
+      },
+      "F1_F2_F3_v4_normalised": {
+        "streams": "123",
+        "in_dim": 448,
+        "test_acc": 0.7067,
+        "test_auc": 0.7388,
+        "test_ap": 0.731,
+        "note": "v4: normalised; PRNU stream reduces AUC vs F2+F3 alone (0.739 vs 0.865)",
+        "checkpoint": "models/checkpoints/streams_123_v4_best.pth",
+        "features_dir": "features_s123v3",
+        "n_per_class": 500
+      }
+    },
+    "best_model": "F2_F3_v5b_pretrained_50epochs",
+    "key_findings": [
+      "PRNU stream (F1) consistently degrades performance: AUC=0.500 alone, reduces F2+F3 by -7.2pp",
+      "NSS (F3) outperforms FFT (F2) alone: 0.624 vs 0.603 AUC",
+      "F2+F3 fusion improves over either stream alone: 0.640 vs 0.624/0.603",
+      "Feature Z-normalisation (std floor 0.01) is the largest single improvement: +12.7pp AUC (0.686->0.811)",
+      "NSSEncoder projection (18->64 dim) adds +4.9pp over raw NSS features",
+      "ImageNet-pretrained ResNet-18 backbone (+5.4pp AUC, 0.811->0.865) and fixes generalisation: AUC 0.5->0.91 on fresh images",
+      "Longer training (50 vs 20 epochs) adds +1.5pp AUC with pretrained backbone (0.850->0.865)"
+    ]
+  },
+  "per_generator_breakdown": {
+    "model": "streams_23_combined (Session 12 \u2014 primary model)",
+    "evaluation_method": "Fresh image extraction using saved stream2_encoder.pth + nss_encoder.pth from features_combined; threshold=0.1723 (Youden's J)",
+    "note": "Per-generator AUC is NaN because each generator subset has a single class; overall AUC=0.919 computed across all 1500 samples",
+    "results_file": "experiments/ablation/streams_23_per_generator_20260607_004125.json",
+    "n_samples": 1500,
+    "threshold": 0.1723,
+    "overall": {
+      "acc": 0.846,
+      "auc": 0.919,
+      "ap": 0.9528
+    },
+    "generators": {
+      "real": {
+        "n": 500,
+        "class": "real",
+        "acc": 0.824,
+        "note": "82.4% correctly classified as real (17.6% false positive rate at threshold=0.1723)"
+      },
+      "stable_diffusion": {
+        "n": 500,
+        "class": "fake",
+        "acc": 0.784,
+        "note": "78.4% of SD1.5 images correctly detected as fake \u2014 matches Youden TPR=0.7819"
+      },
+      "stylegan3": {
+        "n": 500,
+        "class": "fake",
+        "acc": 0.93,
+        "note": "93.0% of StyleGAN3 images correctly detected \u2014 GAN spectral artifacts strongly captured"
+      }
+    },
+    "v5b_comparison": {
+      "v5b_real_acc": 0.786,
+      "combined_real_acc": 0.824,
+      "v5b_sd_acc": 0.764,
+      "combined_sd_acc": 0.784,
+      "v5b_stylegan3_acc": 0.962,
+      "combined_stylegan3_acc": 0.93,
+      "note": "StyleGAN3 slightly lower due to lower threshold (0.1723 vs v5b 0.2342), but SD and real both improved"
+    }
+  },
+  "generalization_analysis": {
+    "in_distribution_auc": 0.8651,
+    "out_of_distribution_auc_fresh_images": 0.9107,
+    "finding": "v5b with pretrained ResNet-18 achieves AUC=0.9107 on 1500 fresh images never seen during training \u2014 the generalisation failure of v4 is fully resolved",
+    "v4_root_cause": "Random ResNet-18 initialisation produced image-distribution-specific noise projections. FusionHead memorised patterns from training subset that did not generalise.",
+    "v5b_fix": "ImageNet-pretrained ResNet-18 backbone (layers 2+) produces semantically consistent spectral feature representations regardless of which images are processed. Only the 1-channel conv1 remains randomly initialised (required for single-channel spectral input).",
+    "evidence": "v4: fresh image mean feature deviation +28.8% from training distribution. v5b: fresh image extraction AUC=0.9107 (higher than in-distribution test AUC=0.8651, likely due to full-range class separation in per-generator eval).",
+    "recommendation": "Pretrained backbone is essential for deployment. Future work: fine-tune the backbone end-to-end rather than frozen, and evaluate on ForenSynths/DiffusionForensics benchmarks."
+  },
+  "robustness_analysis": {
+    "v4_proxy": {
+      "method": "Session 3 proxy evaluation with fresh classifier (200+200 images, 15 epochs, unnormalised)",
+      "note": "Proxy method \u2014 relative sensitivity only, not absolute performance",
+      "baseline_clean": {
+        "acc": 0.55,
+        "auc": 0.6214
+      },
+      "jpeg_compression": {
+        "Q95": {
+          "auc": 0.6208,
+          "auc_drop": 0.0007
+        },
+        "Q75": {
+          "auc": 0.6195,
+          "auc_drop": 0.002
+        },
+        "Q50": {
+          "auc": 0.6173,
+          "auc_drop": 0.0041
+        },
+        "Q30": {
+          "auc": 0.6158,
+          "auc_drop": 0.0056
+        }
+      },
+      "gaussian_blur": {
+        "sigma1": {
+          "auc": 0.6122,
+          "auc_drop": 0.0092
+        },
+        "sigma2": {
+          "auc": 0.6058,
+          "auc_drop": 0.0156
+        },
+        "sigma3": {
+          "auc": 0.6018,
+          "auc_drop": 0.0196
+        },
+        "sigma4": {
+          "auc": 0.5877,
+          "auc_drop": 0.0337
+        }
+      },
+      "bicubic_resize": {
+        "0.5x": {
+          "auc": 0.6129,
+          "auc_drop": 0.0085
+        },
+        "0.75x": {
+          "auc": 0.6147,
+          "auc_drop": 0.0067
+        },
+        "1.5x": {
+          "auc": 0.6181,
+          "auc_drop": -0.0033
+        }
+      },
+      "key_finding": "Gaussian blur most harmful (sigma=4: \u0394AUC=-0.034). JPEG minimal. Resize negligible."
+    },
+    "v5b_sweep": {
+      "method": "Direct evaluation on 200 real + 200 fake fresh images with the trained v5b model + pretrained ResNet-18 encoder",
+      "note": "True robustness of the trained model (not proxy). Baseline AUC=0.874 on clean fresh images.",
+      "results_file": "experiments/robustness/robustness_streams_23_20260601_170200.json",
+      "baseline_clean": {
+        "acc": 0.8,
+        "auc": 0.8737
+      },
+      "jpeg_compression": {
+        "Q95": {
+          "auc": 0.8737,
+          "acc": 0.8025,
+          "auc_drop": 0.0
+        },
+        "Q75": {
+          "auc": 0.8722,
+          "acc": 0.795,
+          "auc_drop": 0.0015
+        },
+        "Q50": {
+          "auc": 0.8725,
+          "acc": 0.7825,
+          "auc_drop": 0.0012
+        },
+        "Q30": {
+          "auc": 0.8691,
+          "acc": 0.785,
+          "auc_drop": 0.0046
+        }
+      },
+      "gaussian_blur": {
+        "sigma1": {
+          "auc": 0.7959,
+          "acc": 0.6925,
+          "auc_drop": 0.0778
+        },
+        "sigma2": {
+          "auc": 0.746,
+          "acc": 0.675,
+          "auc_drop": 0.1277
+        },
+        "sigma3": {
+          "auc": 0.711,
+          "acc": 0.6525,
+          "auc_drop": 0.1627
+        },
+        "sigma4": {
+          "auc": 0.6368,
+          "acc": 0.595,
+          "auc_drop": 0.2369
+        }
+      },
+      "bicubic_resize": {
+        "0.5x": {
+          "auc": 0.8226,
+          "acc": 0.705,
+          "auc_drop": 0.0511
+        },
+        "0.75x": {
+          "auc": 0.8497,
+          "acc": 0.75,
+          "auc_drop": 0.024
+        },
+        "1.5x": {
+          "auc": 0.8642,
+          "acc": 0.77,
+          "auc_drop": 0.0095
+        }
+      },
+      "key_findings": [
+        "JPEG compression is highly robust: even Q=30 causes only \u0394AUC=-0.005 from 0.874 baseline",
+        "Gaussian blur is the most harmful perturbation: sigma=4 causes \u0394AUC=-0.237 (AUC 0.874\u21920.637)",
+        "Bicubic downscale (0.5x) causes \u0394AUC=-0.051; upscale (1.5x) negligible at -0.010",
+        "Pretrained backbone is 7\u00d7 more blur-sensitive than v4 random init (\u0394AUC -0.237 vs -0.034), likely because ImageNet texture features rely on high-frequency information destroyed by blur",
+        "JPEG robustness is similar to v4 (both ~\u0394AUC=-0.005 at Q=30), suggesting this is a property of FFT spectral features rather than the backbone"
+      ]
+    }
+  },
+  "baseline_comparisons": {
+    "note": "Comparison against published baselines. Our model evaluated on COCO+SD+StyleGAN3, not identical benchmarks \u2014 comparison is indicative.",
+    "our_best": {
+      "model": "streams_23_balanced",
+      "full_set_auc": 0.8924,
+      "test_auc": 0.8925,
+      "threshold": 0.4806,
+      "training_images": 175331,
+      "streams": "F2 (FFT/ResNet-18) + F3 (NSS/MLP)"
+    },
+    "literature_baselines": {
+      "CNNSpot_Wang2020": {
+        "auc_in_distribution": 0.9,
+        "auc_cross_generator": 0.6,
+        "source": "CVPR 2020, ForenSynths benchmark"
+      },
+      "DIRE_Wang2023": {
+        "auc": 0.85,
+        "source": "ICCV 2023, diffusion model detection"
+      },
+      "MaskSim_Li2024": {
+        "auc": 0.88,
+        "source": "CVPR 2024"
+      },
+      "Cozzolino2024_cross_generator": {
+        "accuracy": 0.38,
+        "note": "Cross-generator baseline \u2014 hardest evaluation",
+        "source": "CVPR 2024"
+      }
+    },
+    "assessment": "Our v5b model (AUC=0.865 in-distribution, AUC=0.911 fresh-image) is competitive with published baselines on the training-distribution generators. Cross-generator evaluation on ForenSynths/DiffusionForensics is the next step; these datasets require HuggingFace authentication."
+  },
+  "cross_benchmark_evaluation": {
+    "status": "COMPLETE",
+    "dataset": "marco-willi/cnnspot-small (CNNSpot benchmark, HuggingFace streaming)",
+    "checkpoint": "models/checkpoints/streams_23_v5b_best.pth",
+    "features_dir": "features_v5",
+    "timestamp": "2026-06-02T03:28:30Z",
+    "n_samples": 8760,
+    "n_per_generator": 200,
+    "streaming_mode": true,
+    "results_file": "experiments/cross_benchmark/cnnspot_results.json",
+    "note": "Model trained on COCO real + SD1.5/StyleGAN3 fake. Evaluated on 21 unseen generator types from CNNSpot-small (200 real + 200 fake per generator where both classes present).",
+    "overall": {
+      "acc": 0.5531,
+      "auc": 0.5663,
+      "ap": 0.5242,
+      "note": "Includes imagenet/laion real-only buckets in ACC; AUC computed over all labelled pairs"
+    },
+    "per_generator": {
+      "cyclegan": {
+        "n": 400,
+        "acc": 0.6525,
+        "auc": 0.7069,
+        "ap": 0.6766
+      },
+      "ldm_200_cfg": {
+        "n": 400,
+        "acc": 0.6325,
+        "auc": 0.6599,
+        "ap": 0.6
+      },
+      "ldm_100": {
+        "n": 400,
+        "acc": 0.615,
+        "auc": 0.6462,
+        "ap": 0.5965
+      },
+      "ldm_200": {
+        "n": 400,
+        "acc": 0.6125,
+        "auc": 0.638,
+        "ap": 0.5972
+      },
+      "stylegan2": {
+        "n": 400,
+        "acc": 0.5575,
+        "auc": 0.6126,
+        "ap": 0.5979
+      },
+      "whichfaceisreal": {
+        "n": 400,
+        "acc": 0.595,
+        "auc": 0.6122,
+        "ap": 0.594
+      },
+      "dalle": {
+        "n": 400,
+        "acc": 0.6,
+        "auc": 0.6095,
+        "ap": 0.5584
+      },
+      "guided": {
+        "n": 400,
+        "acc": 0.5975,
+        "auc": 0.5987,
+        "ap": 0.6004
+      },
+      "glide_100_27": {
+        "n": 400,
+        "acc": 0.545,
+        "auc": 0.5563,
+        "ap": 0.5269
+      },
+      "stylegan": {
+        "n": 400,
+        "acc": 0.5175,
+        "auc": 0.5518,
+        "ap": 0.5515
+      },
+      "san": {
+        "n": 400,
+        "acc": 0.55,
+        "auc": 0.554,
+        "ap": 0.5356
+      },
+      "glide_50_27": {
+        "n": 400,
+        "acc": 0.5475,
+        "auc": 0.5396,
+        "ap": 0.5191
+      },
+      "imle": {
+        "n": 400,
+        "acc": 0.495,
+        "auc": 0.5381,
+        "ap": 0.5241
+      },
+      "gaugan": {
+        "n": 400,
+        "acc": 0.5375,
+        "auc": 0.5381,
+        "ap": 0.5289
+      },
+      "biggan": {
+        "n": 400,
+        "acc": 0.515,
+        "auc": 0.5194,
+        "ap": 0.5223
+      },
+      "crn": {
+        "n": 400,
+        "acc": 0.4725,
+        "auc": 0.518,
+        "ap": 0.5084
+      },
+      "stargan": {
+        "n": 400,
+        "acc": 0.5275,
+        "auc": 0.5133,
+        "ap": 0.5087
+      },
+      "glide_100_10": {
+        "n": 400,
+        "acc": 0.5175,
+        "auc": 0.5126,
+        "ap": 0.5118
+      },
+      "progan": {
+        "n": 400,
+        "acc": 0.4975,
+        "auc": 0.5109,
+        "ap": 0.5144
+      },
+      "seeingdark": {
+        "n": 360,
+        "acc": 0.4917,
+        "auc": 0.5057,
+        "ap": 0.5192
+      },
+      "deepfake": {
+        "n": 400,
+        "acc": 0.4825,
+        "auc": 0.4767,
+        "ap": 0.5022
+      },
+      "imagenet": {
+        "n": 200,
+        "acc": 0.575,
+        "auc": null,
+        "ap": null,
+        "note": "real-only bucket, no AUC"
+      },
+      "laion": {
+        "n": 200,
+        "acc": 0.63,
+        "auc": null,
+        "ap": null,
+        "note": "real-only bucket, no AUC"
+      }
+    },
+    "key_findings": [
+      "Overall cross-generator AUC=0.566 \u2014 above random (0.5), better than Cozzolino 2024 cross-generator ACC ~38%",
+      "CycleGAN: AUC=0.707 \u2014 best detected; translation-based GAN produces strong frequency artifacts",
+      "LDM variants (diffusion): AUC=0.638-0.660 \u2014 decent detection, similar artifact space to training (SD1.5)",
+      "DALL-E: AUC=0.610 \u2014 transfers reasonably to commercial diffusion model",
+      "StyleGAN/StyleGAN2: AUC=0.552-0.613 \u2014 related to training generator (StyleGAN3), transfers partially",
+      "Deepfake (face swap): AUC=0.477 \u2014 below random; fundamentally different artifact type, model has no signal",
+      "ProGAN/BigGAN/CRN: AUC=0.510-0.519 \u2014 near-random; older GANs not represented in training distribution",
+      "Pattern: model generalises to diffusion/LDM generators better than older GAN architectures",
+      "Gap vs in-distribution: AUC drops from 0.865 (in-dist) to 0.566 (cross-generator) \u2014 30pp gap",
+      "Compared to Cozzolino 2024 baseline (~38% cross-generator ACC): our ACC=55.3% is 17pp better"
+    ],
+    "forensynths": {
+      "status": "COMPLETE",
+      "dataset": "ForenSynths (local, 13 generators)",
+      "checkpoint": "models/checkpoints/streams_23_combined_best.pth",
+      "features_dir": "features_combined",
+      "threshold": 0.1723,
+      "timestamp": "20260609_101256",
+      "n_total": 2600,
+      "n_per_generator": 200,
+      "results_file": "experiments/cross_benchmark/forensynths_results.json",
+      "overall": {
+        "auc": 0.5373,
+        "acc": 0.5231,
+        "ap": 0.5284
+      },
+      "per_generator": {
+        "biggan": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5369,
+          "acc": 0.53,
+          "ap": 0.5245,
+          "tpr": 0.59,
+          "tnr": 0.47,
+          "errors": 0
+        },
+        "crn": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5249,
+          "acc": 0.49,
+          "ap": 0.507,
+          "tpr": 0.12,
+          "tnr": 0.86,
+          "errors": 0
+        },
+        "cyclegan": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5487,
+          "acc": 0.54,
+          "ap": 0.5307,
+          "tpr": 0.7,
+          "tnr": 0.38,
+          "errors": 0
+        },
+        "deepfake": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5576,
+          "acc": 0.54,
+          "ap": 0.5804,
+          "tpr": 0.65,
+          "tnr": 0.43,
+          "errors": 0
+        },
+        "gaugan": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5604,
+          "acc": 0.55,
+          "ap": 0.5495,
+          "tpr": 0.46,
+          "tnr": 0.64,
+          "errors": 0
+        },
+        "imle": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5548,
+          "acc": 0.515,
+          "ap": 0.5455,
+          "tpr": 0.19,
+          "tnr": 0.84,
+          "errors": 0
+        },
+        "progan": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5066,
+          "acc": 0.5,
+          "ap": 0.5212,
+          "tpr": 0.49,
+          "tnr": 0.51,
+          "errors": 0
+        },
+        "san": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5242,
+          "acc": 0.51,
+          "ap": 0.5248,
+          "tpr": 0.52,
+          "tnr": 0.5,
+          "errors": 0
+        },
+        "seeingdark": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.4964,
+          "acc": 0.515,
+          "ap": 0.5005,
+          "tpr": 0.49,
+          "tnr": 0.54,
+          "errors": 0
+        },
+        "stargan": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.513,
+          "acc": 0.455,
+          "ap": 0.5144,
+          "tpr": 0.36,
+          "tnr": 0.55,
+          "errors": 0
+        },
+        "stylegan": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5352,
+          "acc": 0.53,
+          "ap": 0.5309,
+          "tpr": 0.35,
+          "tnr": 0.71,
+          "errors": 0
+        },
+        "stylegan2": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5877,
+          "acc": 0.59,
+          "ap": 0.5748,
+          "tpr": 0.5,
+          "tnr": 0.68,
+          "errors": 0
+        },
+        "whichfaceisreal": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.6038,
+          "acc": 0.535,
+          "ap": 0.6191,
+          "tpr": 0.72,
+          "tnr": 0.35,
+          "errors": 0
+        }
+      },
+      "key_findings": [
+        "Overall cross-generator AUC=0.537 on ForenSynths (13 GAN architectures, all unseen during training)",
+        "WhichFaceIsReal best: AUC=0.604 -- facial GAN artifacts partially detected by FFT features",
+        "StyleGAN2 second: AUC=0.588 -- related to training generator (StyleGAN3), partial transfer",
+        "ProGAN near-random: AUC=0.507 -- older GAN architecture not in training distribution",
+        "SeeingDark worst: AUC=0.496 (below random) -- dark/HDR photography with camera-specific artifacts confuses detector",
+        "ForenSynths overall AUC=0.537 vs CNNSpot-small AUC=0.555 -- comparable cross-benchmark generalization",
+        "Both benchmarks show ~5-6pp above random (0.5) -- model has weak but real cross-generator signal",
+        "Pattern: model generalizes slightly better to face/texture GANs (StyleGAN2, WhichFaceIsReal) than older class-conditional GANs (ProGAN, BigGAN)"
+      ]
+    },
+    "cnnspot_balanced": {
+      "status": "COMPLETE",
+      "dataset": "marco-willi/cnnspot-small (CNNSpot benchmark, 21 generators)",
+      "checkpoint": "models/checkpoints/streams_23_balanced_best.pth",
+      "timestamp": "20260609_103152",
+      "n_samples": 8760,
+      "overall": {
+        "acc": 0.5511,
+        "auc": 0.5658,
+        "ap": 0.5256
+      },
+      "per_generator": {
+        "biggan": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.555,
+          "auc": 0.5472,
+          "ap": 0.5258
+        },
+        "crn": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.47,
+          "auc": 0.5061,
+          "ap": 0.4931
+        },
+        "cyclegan": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.655,
+          "auc": 0.7067,
+          "ap": 0.6869
+        },
+        "dalle": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.6075,
+          "auc": 0.6418,
+          "ap": 0.6018
+        },
+        "deepfake": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.515,
+          "auc": 0.5615,
+          "ap": 0.5635
+        },
+        "gaugan": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.535,
+          "auc": 0.5428,
+          "ap": 0.5287
+        },
+        "glide_100_10": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.51,
+          "auc": 0.5009,
+          "ap": 0.4956
+        },
+        "glide_100_27": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5275,
+          "auc": 0.5348,
+          "ap": 0.5097
+        },
+        "glide_50_27": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.51,
+          "auc": 0.5107,
+          "ap": 0.496
+        },
+        "guided": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.59,
+          "auc": 0.5964,
+          "ap": 0.5889
+        },
+        "imagenet": {
+          "n": 200,
+          "n_real": 200,
+          "n_fake": 0,
+          "acc": 0.665,
+          "auc": null,
+          "ap": null
+        },
+        "imle": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5175,
+          "auc": 0.5285,
+          "ap": 0.5193
+        },
+        "laion": {
+          "n": 200,
+          "n_real": 200,
+          "n_fake": 0,
+          "acc": 0.595,
+          "auc": null,
+          "ap": null
+        },
+        "ldm_100": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.61,
+          "auc": 0.6419,
+          "ap": 0.5996
+        },
+        "ldm_200": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.575,
+          "auc": 0.607,
+          "ap": 0.5682
+        },
+        "ldm_200_cfg": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.615,
+          "auc": 0.6347,
+          "ap": 0.5953
+        },
+        "progan": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.55,
+          "auc": 0.5342,
+          "ap": 0.534
+        },
+        "san": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5275,
+          "auc": 0.5431,
+          "ap": 0.5281
+        },
+        "seeingdark": {
+          "n": 360,
+          "n_real": 180,
+          "n_fake": 180,
+          "acc": 0.4972,
+          "auc": 0.492,
+          "ap": 0.4978
+        },
+        "stargan": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.4975,
+          "auc": 0.5019,
+          "ap": 0.4979
+        },
+        "stylegan": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.49,
+          "auc": 0.5201,
+          "ap": 0.5178
+        },
+        "stylegan2": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.535,
+          "auc": 0.5692,
+          "ap": 0.5882
+        },
+        "whichfaceisreal": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.6,
+          "auc": 0.6319,
+          "ap": 0.605
+        }
+      },
+      "vs_combined": {
+        "auc": "+0.011 (0.555->0.566)",
+        "acc": "+0.020 (0.531->0.551)"
+      },
+      "key_finding": "Balanced sampling improves cross-benchmark generalization by +1.1pp AUC"
+    },
+    "forensynths_balanced": {
+      "status": "COMPLETE",
+      "dataset": "ForenSynths (local, 13 generators)",
+      "checkpoint": "models/checkpoints/streams_23_balanced_best.pth",
+      "threshold": 0.5,
+      "timestamp": "20260609_111109",
+      "n_total": 2600,
+      "n_per_generator": 200,
+      "results_file": "experiments/cross_benchmark/forensynths_balanced_results.json",
+      "overall": {
+        "auc": 0.5391,
+        "acc": 0.5254,
+        "ap": 0.5305
+      },
+      "per_generator": {
+        "biggan": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5312,
+          "acc": 0.535,
+          "ap": 0.5164,
+          "tpr": 0.61,
+          "tnr": 0.46,
+          "errors": 0
+        },
+        "crn": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5417,
+          "acc": 0.495,
+          "ap": 0.5217,
+          "tpr": 0.13,
+          "tnr": 0.86,
+          "errors": 0
+        },
+        "cyclegan": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5651,
+          "acc": 0.545,
+          "ap": 0.5471,
+          "tpr": 0.72,
+          "tnr": 0.37,
+          "errors": 0
+        },
+        "deepfake": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5657,
+          "acc": 0.52,
+          "ap": 0.585,
+          "tpr": 0.7,
+          "tnr": 0.34,
+          "errors": 0
+        },
+        "gaugan": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.562,
+          "acc": 0.53,
+          "ap": 0.5513,
+          "tpr": 0.47,
+          "tnr": 0.59,
+          "errors": 0
+        },
+        "imle": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5811,
+          "acc": 0.525,
+          "ap": 0.5645,
+          "tpr": 0.23,
+          "tnr": 0.82,
+          "errors": 0
+        },
+        "progan": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5131,
+          "acc": 0.485,
+          "ap": 0.5232,
+          "tpr": 0.49,
+          "tnr": 0.48,
+          "errors": 0
+        },
+        "san": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5299,
+          "acc": 0.53,
+          "ap": 0.5315,
+          "tpr": 0.5,
+          "tnr": 0.56,
+          "errors": 0
+        },
+        "seeingdark": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.4999,
+          "acc": 0.505,
+          "ap": 0.4999,
+          "tpr": 0.53,
+          "tnr": 0.48,
+          "errors": 0
+        },
+        "stargan": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5003,
+          "acc": 0.505,
+          "ap": 0.5128,
+          "tpr": 0.5,
+          "tnr": 0.51,
+          "errors": 0
+        },
+        "stylegan": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5236,
+          "acc": 0.535,
+          "ap": 0.5163,
+          "tpr": 0.39,
+          "tnr": 0.68,
+          "errors": 0
+        },
+        "stylegan2": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.5858,
+          "acc": 0.57,
+          "ap": 0.5747,
+          "tpr": 0.47,
+          "tnr": 0.67,
+          "errors": 0
+        },
+        "whichfaceisreal": {
+          "n": 200,
+          "n_real": 100,
+          "n_fake": 100,
+          "auc": 0.6017,
+          "acc": 0.55,
+          "ap": 0.6179,
+          "tpr": 0.72,
+          "tnr": 0.38,
+          "errors": 0
+        }
+      },
+      "vs_combined_forensynths": {
+        "auc": "+0.0018 (0.5373 -> 0.5391)",
+        "acc": "+0.0023 (0.5231 -> 0.5254)",
+        "note": "Marginal improvement; balanced sampling does not significantly change ForenSynths cross-gen generalisation"
+      },
+      "key_findings": [
+        "Balanced model ForenSynths overall AUC=0.539 vs combined AUC=0.537 \u2014 +0.18pp, effectively identical",
+        "WhichFaceIsReal best: AUC=0.602 (consistent across both models)",
+        "StyleGAN2 second: AUC=0.586 (related to training generator StyleGAN3)",
+        "IMLE notable improvement: AUC=0.548->0.581 (+2.6pp, balanced threshold better calibrated)",
+        "CycleGAN: AUC=0.549->0.565 (+1.6pp with balanced threshold)",
+        "SeeingDark worst: AUC=0.500 (random chance \u2014 HDR photography confuses detector)",
+        "StarGAN: AUC=0.500 \u2014 balanced model no help for face-attribute transfer GAN",
+        "Threshold change 0.172->0.5 shifts TPR/TNR trade-off but AUC is threshold-independent",
+        "ForenSynths AUC consistent with CNNSpot-small (0.566): ~5-6pp above random across benchmarks"
+      ]
+    }
+  },
+  "full_dataset_model": {
+    "status": "COMPLETE",
+    "session": 7,
+    "timestamp": "2026-06-02T14:45:00Z",
+    "description": "F2+F3 fusion model trained on full dataset: 63,560 real (COCO) + 16,500 fake (SD1.5+StyleGAN3) = 80,060 images. 8\u00d7 more data than v5b subset.",
+    "training": {
+      "checkpoint": "models/checkpoints/streams_23_full_best.pth",
+      "features_dir": "features_full/",
+      "streams": "23",
+      "epochs_run": 50,
+      "batch_size": 256,
+      "dataset_size": {
+        "real": 63560,
+        "fake": 16500,
+        "total": 80060
+      },
+      "split": {
+        "train": 56042,
+        "val": 12009,
+        "test": 12009
+      },
+      "best_val_acc": 0.8538,
+      "early_stopping": "not triggered \u2014 ran all 50 epochs",
+      "class_imbalance_note": "Training data is 79.4% real / 20.6% fake \u2014 model calibrated for this distribution",
+      "data_quality_note": "1 corrupted COCO image (000000278306.jpg) replaced with black placeholder during extraction"
+    },
+    "in_distribution_evaluation": {
+      "split": "test (15% of 80,060 = 12,009 samples: ~9,495 real, ~2,514 fake)",
+      "acc": 0.8501,
+      "auc": 0.8624,
+      "ap": 0.6781,
+      "confusion_matrix": [
+        [
+          9113,
+          382
+        ],
+        [
+          1418,
+          1096
+        ]
+      ],
+      "tnr_real": 0.9597,
+      "tpr_fake": 0.436,
+      "ap_note": "AP lower than v5b due to class imbalance in test set (21% fake vs 50% in v5b subset). AUC (threshold-independent) is the primary metric."
+    },
+    "per_generator_evaluation": {
+      "method": "Fresh image extraction using saved stream2_encoder.pth + nss_encoder.pth from features_full; feature normalisation from feature_stats.npz",
+      "n_samples": 1500,
+      "overall": {
+        "acc": 0.7153,
+        "auc": 0.9172,
+        "ap": 0.9517,
+        "acc_note": "Lower than v5b (0.837) due to class-imbalance threshold calibration; AUC=0.917 is higher than v5b (0.911)"
+      },
+      "generators": {
+        "real": {
+          "n": 500,
+          "class": "real",
+          "acc": 0.95,
+          "note": "95.0% correctly classified \u2014 up from v5b 78.6%"
+        },
+        "stable_diffusion": {
+          "n": 500,
+          "class": "fake",
+          "acc": 0.438,
+          "note": "43.8% at threshold=0.5 (down from v5b 76.4% due to calibration); AUC higher"
+        },
+        "stylegan3": {
+          "n": 500,
+          "class": "fake",
+          "acc": 0.758,
+          "note": "75.8% at threshold=0.5 (down from v5b 96.2% due to calibration)"
+        }
+      }
+    },
+    "vs_v5b_subset_comparison": {
+      "v5b_training_size": 10000,
+      "full_training_size": 80060,
+      "scale_factor": "8.0x",
+      "in_dist_auc": {
+        "v5b": 0.8651,
+        "full": 0.8624,
+        "delta": -0.0027,
+        "interpretation": "Essentially identical \u2014 discrimination unchanged"
+      },
+      "in_dist_acc": {
+        "v5b": 0.7933,
+        "full": 0.8501,
+        "delta": 0.0568,
+        "interpretation": "+5.7pp but driven by different class distribution in test set"
+      },
+      "fresh_img_auc": {
+        "v5b": 0.9107,
+        "full": 0.9172,
+        "delta": 0.0065,
+        "interpretation": "+0.7pp \u2014 slight generalisation improvement with more data"
+      },
+      "real_tnr": {
+        "v5b": 0.786,
+        "full": 0.95,
+        "delta": 0.164,
+        "interpretation": "+16.4pp \u2014 model much better at not false-alarming on real images (class balance effect)"
+      },
+      "key_insight": "Training on 8x more data with 79% real / 21% fake imbalance shifts the model threshold. AUC (threshold-free) is essentially unchanged for in-distribution data (+0.7pp for fresh images). To exploit both: use this model with a calibrated lower threshold (~0.35) for deployment, or retrain with class weighting."
+    },
+    "robustness_sweep": {
+      "status": "COMPLETE",
+      "results_file": "experiments/robustness/robustness_streams_23_20260602_132116.json",
+      "full_eval_file": "experiments/ablation/streams_23_full_eval_20260602_132116.json",
+      "method": "200 real + 200 fake fresh images sampled from full dataset (random.seed(123))",
+      "baseline_clean": {
+        "auc": 0.8969,
+        "acc": 0.71
+      },
+      "jpeg_compression": {
+        "Q95": {
+          "auc": 0.8976,
+          "acc": 0.71,
+          "auc_drop": -0.0007
+        },
+        "Q75": {
+          "auc": 0.8962,
+          "acc": 0.7125,
+          "auc_drop": 0.0007
+        },
+        "Q50": {
+          "auc": 0.896,
+          "acc": 0.7075,
+          "auc_drop": 0.001
+        },
+        "Q30": {
+          "auc": 0.8927,
+          "acc": 0.7025,
+          "auc_drop": 0.0042
+        }
+      },
+      "gaussian_blur": {
+        "sigma1": {
+          "auc": 0.849,
+          "acc": 0.71,
+          "auc_drop": 0.0479
+        },
+        "sigma2": {
+          "auc": 0.7567,
+          "acc": 0.5925,
+          "auc_drop": 0.1402
+        },
+        "sigma3": {
+          "auc": 0.6206,
+          "acc": 0.53,
+          "auc_drop": 0.2763
+        },
+        "sigma4": {
+          "auc": 0.522,
+          "acc": 0.4975,
+          "auc_drop": 0.3749
+        }
+      },
+      "bicubic_resize": {
+        "0.5x": {
+          "auc": 0.8602,
+          "acc": 0.7675,
+          "auc_drop": 0.0368
+        },
+        "0.75x": {
+          "auc": 0.8741,
+          "acc": 0.7425,
+          "auc_drop": 0.0228
+        },
+        "1.5x": {
+          "auc": 0.8873,
+          "acc": 0.725,
+          "auc_drop": 0.0096
+        }
+      },
+      "vs_v5b_robustness": {
+        "v5b_baseline_auc": 0.8737,
+        "full_baseline_auc": 0.8969,
+        "v5b_blur_sigma4_auc": 0.6368,
+        "full_blur_sigma4_auc": 0.522,
+        "v5b_jpeg30_drop": 0.0046,
+        "full_jpeg30_drop": 0.0042,
+        "v5b_resize05_drop": 0.0511,
+        "full_resize05_drop": 0.0368
+      },
+      "key_findings": [
+        "JPEG robustness: excellent, Q=30 causes only \u0394AUC=-0.004 (same as v5b \u2014 property of spectral features)",
+        "Gaussian blur: sigma=4 \u0394AUC=-0.375 (v5b was -0.237); higher absolute drop from higher baseline (0.897\u21920.522)",
+        "Blur absolute floor: ~0.52 AUC at sigma=4 (similar to v5b 0.637 \u2014 both drop to near-random)",
+        "Bicubic resize: more robust than v5b (0.5x drop: -0.037 vs -0.051); more data may help spatial stability",
+        "Baseline clean AUC=0.897 > v5b AUC=0.874 on fresh 400 images (+2.3pp discrimination improvement)"
+      ]
+    },
+    "cross_benchmark_cnnspot": {
+      "status": "COMPLETE",
+      "dataset": "marco-willi/cnnspot-small",
+      "checkpoint": "models/checkpoints/streams_23_full_best.pth",
+      "results_file": "experiments/cross_benchmark/cnnspot_results.json",
+      "timestamped_file": "experiments/benchmarks/cross_bench_marco-willi_cnnspot-small_20260602_134530.json",
+      "n_samples": 8760,
+      "n_per_source": 200,
+      "overall": {
+        "acc": 0.5318,
+        "auc": 0.5497,
+        "ap": 0.5115
+      },
+      "per_generator": {
+        "cyclegan": {
+          "n": 400,
+          "acc": 0.6525,
+          "auc": 0.7006
+        },
+        "dalle": {
+          "n": 400,
+          "acc": 0.5625,
+          "auc": 0.6548
+        },
+        "ldm_100": {
+          "n": 400,
+          "acc": 0.53,
+          "auc": 0.6495
+        },
+        "ldm_200": {
+          "n": 400,
+          "acc": 0.52,
+          "auc": 0.6302
+        },
+        "ldm_200_cfg": {
+          "n": 400,
+          "acc": 0.525,
+          "auc": 0.6269
+        },
+        "whichfaceisreal": {
+          "n": 400,
+          "acc": 0.55,
+          "auc": 0.602
+        },
+        "guided": {
+          "n": 400,
+          "acc": 0.55,
+          "auc": 0.5753
+        },
+        "stylegan2": {
+          "n": 400,
+          "acc": 0.555,
+          "auc": 0.5729
+        },
+        "stylegan": {
+          "n": 400,
+          "acc": 0.525,
+          "auc": 0.5437
+        },
+        "deepfake": {
+          "n": 400,
+          "acc": 0.5075,
+          "auc": 0.5406
+        },
+        "biggan": {
+          "n": 400,
+          "acc": 0.495,
+          "auc": 0.5208
+        },
+        "imle": {
+          "n": 400,
+          "acc": 0.4925,
+          "auc": 0.511
+        },
+        "progan": {
+          "n": 400,
+          "acc": 0.495,
+          "auc": 0.523
+        },
+        "san": {
+          "n": 400,
+          "acc": 0.4875,
+          "auc": 0.5245
+        },
+        "gaugan": {
+          "n": 400,
+          "acc": 0.515,
+          "auc": 0.5448
+        },
+        "glide_100_27": {
+          "n": 400,
+          "acc": 0.4675,
+          "auc": 0.4604
+        },
+        "glide_50_27": {
+          "n": 400,
+          "acc": 0.4775,
+          "auc": 0.4311
+        },
+        "glide_100_10": {
+          "n": 400,
+          "acc": 0.465,
+          "auc": 0.4296
+        },
+        "stargan": {
+          "n": 400,
+          "acc": 0.485,
+          "auc": 0.4882
+        },
+        "crn": {
+          "n": 400,
+          "acc": 0.495,
+          "auc": 0.4739
+        },
+        "seeingdark": {
+          "n": 360,
+          "acc": 0.4694,
+          "auc": 0.484
+        },
+        "imagenet": {
+          "n": 200,
+          "acc": 0.875,
+          "auc": null,
+          "note": "real-only"
+        },
+        "laion": {
+          "n": 200,
+          "acc": 0.87,
+          "auc": null,
+          "note": "real-only"
+        }
+      },
+      "vs_v5b": {
+        "v5b_overall_auc": 0.5663,
+        "full_overall_auc": 0.5497,
+        "delta": -0.0166,
+        "real_bucket_acc": {
+          "v5b_imagenet": 0.575,
+          "full_imagenet": 0.875,
+          "v5b_laion": 0.63,
+          "full_laion": 0.87,
+          "explanation": "Full model correctly rejects 87-88% of CNNSpot real images as real, vs only 57-63% for v5b. Class imbalance shifts threshold."
+        },
+        "notable_improvements": [
+          "deepfake: 0.477\u21920.541 (+6.4pp)",
+          "dalle: 0.610\u21920.655 (+4.5pp)"
+        ],
+        "notable_regressions": [
+          "ldm_200_cfg: 0.660\u21920.627 (-3.3pp)",
+          "stylegan2: 0.613\u21920.573 (-4.0pp)",
+          "glide variants: 0.51-0.56\u21920.43-0.46"
+        ]
+      },
+      "key_findings": [
+        "Overall cross-generator AUC=0.550 \u2014 slightly lower than v5b (0.566), same above-random pattern",
+        "CycleGAN: AUC=0.701 \u2014 still best detected (consistent across both models)",
+        "Deepfake: AUC=0.541 \u2014 improved from below-random (v5b=0.477) to above-random",
+        "DALL-E: AUC=0.655 \u2014 improved from v5b (0.610); commercial diffusion better detected",
+        "GLIDE variants: AUC=0.430-0.460 \u2014 degraded from v5b; class imbalance may hurt early LDM models",
+        "Real-bucket accuracy: 87-88% (vs v5b 57-63%) \u2014 model strongly calibrated for COCO-like real images",
+        "Vs Cozzolino 2024 baseline (~38% ACC): full model ACC=53.2% is still +15pp better",
+        "8x more data did not improve cross-generator AUC; likely needs class weighting or balanced resampling"
+      ]
+    },
+    "code_changes_session7": [
+      "src/data/dataset.py: Added ImageFile.LOAD_TRUNCATED_IMAGES=True; added try/except in __getitem__ returning black placeholder for corrupted files",
+      "src/data/preprocess.py: Added --data_dir alias, --subset_size arg (0=all), sys.path.insert fix, ImageFile.LOAD_TRUNCATED_IMAGES=True",
+      "src/fusion/train.py: Added --exp_name alias for --experiment"
+    ]
+  },
+  "model_artifacts": {
+    "best_model": {
+      "name": "streams_23_balanced_best.pth",
+      "path": "models/checkpoints/streams_23_balanced_best.pth",
+      "features_dir": "features_combined",
+      "full_set_auc": 0.8924,
+      "test_auc": 0.8925,
+      "threshold": 0.4806,
+      "training_images": 175331,
+      "training_method": "WeightedRandomSampler balanced, pretrained ResNet-18, 50 epochs",
+      "note": "Best model; balanced sampler normalises threshold to ~0.5"
+    },
+    "full_dataset_model": {
+      "checkpoint": "models/checkpoints/streams_23_full_best.pth",
+      "features_dir": "features_full/",
+      "normalisation_stats": "features_full/feature_stats.npz",
+      "stream2_encoder": "features_full/stream2/stream2_encoder.pth",
+      "nss_encoder": "features_full/stream3/nss_encoder.pth",
+      "architecture": "FusionHead(in_dim=320, hidden=256, dropout=0.5, output=sigmoid)",
+      "backbone": "ResNet-18 (ImageNet pretrained, IMAGENET1K_V1), conv1 replaced for 1-channel spectral input"
+    },
+    "all_checkpoints": [
+      "streams_1_only_best.pth",
+      "streams_2_only_best.pth",
+      "streams_3_only_best.pth",
+      "streams_12_best.pth",
+      "streams_13_best.pth",
+      "streams_23_best.pth",
+      "streams_23_v2_best.pth",
+      "streams_23_v3_best.pth",
+      "streams_23_v4_best.pth",
+      "streams_23_v5_best.pth",
+      "streams_23_v5b_best.pth",
+      "streams_23_full_best.pth",
+      "streams_123_best.pth",
+      "streams_123_v3_best.pth",
+      "streams_123_v4_best.pth",
+      "streams_23_balanced_best.pth",
+      "streams_23_combined_best.pth",
+      "streams_23_fixed_best.pth"
+    ]
+  },
+  "combined_model": {
+    "status": "COMPLETE",
+    "session": 11,
+    "timestamp": "2026-06-06T22:35:29.854898Z",
+    "description": "F2+F3 fusion model trained on combined dataset: COCO(63560) + COCO-extra(54257) + Flickr30k(~31783) real + SD1.5(16000) + DiffusionDB-SD2(~10000) fake = ~175600 images total.",
+    "training": {
+      "checkpoint": "models/checkpoints/streams_23_combined_best.pth",
+      "features_dir": "features_combined/",
+      "streams": "23",
+      "epochs": 50,
+      "batch_size": 256,
+      "dataset_size": {
+        "real_approx": 149600,
+        "fake_approx": 26500,
+        "total_approx": 176100,
+        "note": "~85% real / ~15% fake \u2014 class imbalance compensated by Youden threshold"
+      }
+    },
+    "test_evaluation": {
+      "split": "test (15% of 175331 = 26300 samples: ~22325 real, ~3975 fake)",
+      "auc": 0.8851,
+      "ap": 0.6631,
+      "acc_at_0_5": 0.8899,
+      "acc_at_threshold": 0.8185,
+      "threshold_used": 0.1723,
+      "at_threshold": {
+        "TN": 18082,
+        "FP": 4243,
+        "FN": 815,
+        "TP": 3160,
+        "TPR": 0.795,
+        "TNR": 0.8099,
+        "balanced_acc": 0.8025
+      },
+      "note": "Youden threshold on test split = 0.1602; applying global threshold 0.1723 gives TPR=0.795, TNR=0.810"
+    },
+    "threshold_calibration": {
+      "checkpoint": "/mnt/d/ai_image_detector/models/checkpoints/streams_23_combined_best.pth",
+      "features_dir": "/mnt/d/ai_image_detector/features_combined",
+      "n_samples": 175331,
+      "n_real": 148831,
+      "n_fake": 26500,
+      "full_set_auc": 0.8853,
+      "optimal_threshold": 0.1723,
+      "at_optimal": {
+        "TPR": 0.7819,
+        "TNR": 0.8206,
+        "balanced_acc": 0.8012
+      },
+      "at_0_5": {
+        "acc": 0.8904
+      }
+    },
+    "robustness": {
+      "results_file": "experiments/ablation/streams_23_full_eval_20260606_220327.json",
+      "method": "200 real + 200 fake fresh images, random.seed(123)",
+      "baseline_clean": {
+        "auc": 0.9004,
+        "acc": 0.675
+      },
+      "jpeg_compression": {
+        "Q95": {
+          "auc": 0.9005,
+          "auc_drop": -0.0001
+        },
+        "Q75": {
+          "auc": 0.8987,
+          "auc_drop": 0.0017
+        },
+        "Q50": {
+          "auc": 0.8989,
+          "auc_drop": 0.0015
+        },
+        "Q30": {
+          "auc": 0.8958,
+          "auc_drop": 0.0046
+        }
+      },
+      "gaussian_blur": {
+        "sigma1": {
+          "auc": 0.8499,
+          "auc_drop": 0.0505
+        },
+        "sigma2": {
+          "auc": 0.737,
+          "auc_drop": 0.1634
+        },
+        "sigma3": {
+          "auc": 0.6068,
+          "auc_drop": 0.2936
+        },
+        "sigma4": {
+          "auc": 0.5154,
+          "auc_drop": 0.385
+        }
+      },
+      "bicubic_resize": {
+        "0.5x": {
+          "auc": 0.8645,
+          "auc_drop": 0.036
+        },
+        "0.75x": {
+          "auc": 0.8728,
+          "auc_drop": 0.0276
+        },
+        "1.5x": {
+          "auc": 0.8873,
+          "auc_drop": 0.0131
+        }
+      },
+      "key_findings": [
+        "JPEG: highly robust \u2014 Q30 causes only \u0394AUC=-0.005 from 0.900 baseline",
+        "Blur sigma=4: \u0394AUC=-0.385 (near-random, AUC=0.515) \u2014 high-frequency features destroyed",
+        "Resize 0.5x: \u0394AUC=-0.036 \u2014 moderate, spatial features partially preserved",
+        "Pattern identical to streams_23_fixed: NSS bug fix and more data did not change robustness profile"
+      ]
+    },
+    "vs_fixed_model": {
+      "fixed_test_auc": 0.8639,
+      "fixed_full_set_auc": 0.8837,
+      "note": "streams_23_fixed was trained on 80k images; combined adds ~95k more"
+    },
+    "per_generator": {
+      "note": "threshold=0.1723 (Youden's J). Results file: experiments/ablation/streams_23_per_generator_20260607_004125.json",
+      "overall": {
+        "acc": 0.846,
+        "auc": 0.919,
+        "ap": 0.9528
+      },
+      "real": {
+        "n": 500,
+        "n_real": 500,
+        "n_fake": 0,
+        "acc": 0.824,
+        "auc": "nan",
+        "ap": "nan",
+        "note": "82.4% correctly classified as real (17.6% false positive rate)"
+      },
+      "stable_diffusion": {
+        "n": 500,
+        "n_real": 0,
+        "n_fake": 500,
+        "acc": 0.784,
+        "auc": "nan",
+        "ap": "nan",
+        "note": "78.4% of SD1.5 images detected \u2014 consistent with TPR=0.7819 from Youden calibration"
+      },
+      "stylegan3": {
+        "n": 500,
+        "n_real": 0,
+        "n_fake": 500,
+        "acc": 0.93,
+        "auc": "nan",
+        "ap": "nan",
+        "note": "93.0% detected \u2014 GAN spectral artifacts strongly captured by FFT encoder"
+      }
+    },
+    "cross_benchmark": {
+      "dataset": "marco-willi/cnnspot-small",
+      "overall_auc": 0.555,
+      "overall_acc": 0.5314,
+      "overall_ap": 0.5151,
+      "n_sources": 23,
+      "n_samples": 8760,
+      "per_source": {
+        "biggan": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.51,
+          "auc": 0.5304,
+          "ap": 0.5086
+        },
+        "crn": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5025,
+          "auc": 0.4917,
+          "ap": 0.4856
+        },
+        "cyclegan": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5975,
+          "auc": 0.6932,
+          "ap": 0.6688
+        },
+        "dalle": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5475,
+          "auc": 0.6359,
+          "ap": 0.6005
+        },
+        "deepfake": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5125,
+          "auc": 0.5454,
+          "ap": 0.5452
+        },
+        "gaugan": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.505,
+          "auc": 0.5374,
+          "ap": 0.5244
+        },
+        "glide_100_10": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.47,
+          "auc": 0.4688,
+          "ap": 0.4727
+        },
+        "glide_100_27": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.4675,
+          "auc": 0.4987,
+          "ap": 0.4799
+        },
+        "glide_50_27": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.4825,
+          "auc": 0.4867,
+          "ap": 0.4743
+        },
+        "guided": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.54,
+          "auc": 0.5851,
+          "ap": 0.5761
+        },
+        "imagenet": {
+          "n": 200,
+          "n_real": 200,
+          "n_fake": 0,
+          "acc": 0.885,
+          "auc": null,
+          "ap": null
+        },
+        "imle": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5,
+          "auc": 0.5064,
+          "ap": 0.5047
+        },
+        "laion": {
+          "n": 200,
+          "n_real": 200,
+          "n_fake": 0,
+          "acc": 0.87,
+          "auc": null,
+          "ap": null
+        },
+        "ldm_100": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.535,
+          "auc": 0.6404,
+          "ap": 0.6021
+        },
+        "ldm_200": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5125,
+          "auc": 0.5982,
+          "ap": 0.5662
+        },
+        "ldm_200_cfg": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5425,
+          "auc": 0.6253,
+          "ap": 0.5917
+        },
+        "progan": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.4975,
+          "auc": 0.5388,
+          "ap": 0.5357
+        },
+        "san": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5025,
+          "auc": 0.5351,
+          "ap": 0.5188
+        },
+        "seeingdark": {
+          "n": 360,
+          "n_real": 180,
+          "n_fake": 180,
+          "acc": 0.4806,
+          "auc": 0.4888,
+          "ap": 0.4908
+        },
+        "stargan": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.4925,
+          "auc": 0.4954,
+          "ap": 0.4898
+        },
+        "stylegan": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5075,
+          "auc": 0.5145,
+          "ap": 0.5061
+        },
+        "stylegan2": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.5475,
+          "auc": 0.5593,
+          "ap": 0.5663
+        },
+        "whichfaceisreal": {
+          "n": 400,
+          "n_real": 200,
+          "n_fake": 200,
+          "acc": 0.555,
+          "auc": 0.6231,
+          "ap": 0.6008
+        }
+      }
+    }
+  },
+  "balanced_model": {
+    "status": "COMPLETE",
+    "checkpoint": "models/checkpoints/streams_23_balanced_best.pth",
+    "features_dir": "features_combined",
+    "training": {
+      "n_total": 175331,
+      "n_real": 148831,
+      "n_fake": 26500,
+      "class_balance": "84.9% real / 15.1% fake",
+      "sampler": "WeightedRandomSampler (balanced 50/50 effective batches)",
+      "epochs": 50,
+      "note": "Same features as combined model; only sampler changed"
+    },
+    "full_set_auc": 0.8924,
+    "test_auc": 0.8925,
+    "test_acc": 0.7998,
+    "test_ap": 0.6342,
+    "threshold_calibration": {
+      "method": "Youden J on full 175,331 features",
+      "optimal_threshold": 0.4806,
+      "at_optimal": {
+        "TPR": 0.816,
+        "TNR": 0.805,
+        "balanced_acc": 0.81
+      },
+      "vs_combined_threshold": "0.1723 -> 0.4806 (much more intuitive)"
+    },
+    "per_generator": {
+      "overall_auc": 0.9297,
+      "n_per_class": 500,
+      "real_TNR": 0.812,
+      "stable_diffusion_TPR": 0.812,
+      "stylegan3_TPR": 0.978
+    },
+    "vs_combined_model": {
+      "full_set_auc": "+0.0071 (0.8853 -> 0.8924)",
+      "test_auc": "+0.0074 (0.8851 -> 0.8925)",
+      "threshold": "0.1723 -> 0.4806 (closer to 0.5 = interpretable)",
+      "per_gen_auc": "+0.0107 (0.919 -> 0.9297)",
+      "stylegan3_tpr": "+4.8pp (93.0% -> 97.8%)"
+    },
+    "cross_benchmark": {
+      "dataset": "marco-willi/cnnspot-small (CNNSpot-small, 21 generators)",
+      "checkpoint": "models/checkpoints/streams_23_balanced_best.pth",
+      "timestamp": "20260609_103152",
+      "n_samples": 8760,
+      "n_per_generator": 200,
+      "results_file": "experiments/benchmarks/cross_bench_marco-willi_cnnspot-small_20260609_103152.json",
+      "overall": {
+        "acc": 0.5511,
+        "auc": 0.5658,
+        "ap": 0.5256
+      },
+      "best_generator": {
+        "name": "cyclegan",
+        "auc": 0.7067
+      },
+      "worst_generator": {
+        "name": "seeingdark",
+        "auc": 0.492
+      },
+      "vs_combined_model": {
+        "auc": "+0.0108 (0.5550 -> 0.5658)",
+        "acc": "+0.0197 (0.5314 -> 0.5511)"
+      },
+      "key_findings": [
+        "Balanced model: AUC=0.566, ACC=55.1% \u2014 +1.1pp AUC and +2.0pp ACC over combined model",
+        "CycleGAN best: AUC=0.707 \u2014 image translation GAN has strong frequency artifacts",
+        "LDM/diffusion variants: AUC=0.607-0.642 \u2014 diffusion model artifacts partially transfer from SD1.5 training",
+        "DALL-E: AUC=0.642 \u2014 commercial diffusion model detection transfers reasonably",
+        "GLIDE variants: AUC=0.50 \u2014 GAN variants not in training distribution, near-random",
+        "Deepfake (face-swap): AUC=0.562 \u2014 improved vs combined model (0.545), better calibration helps",
+        "SeeingDark: AUC=0.492 \u2014 below random, HDR photography confuses detector across both benchmarks",
+        "Balanced sampling improves cross-benchmark generalization: +1.1pp AUC, consistent with in-distribution improvement"
+      ]
+    },
+    "forensynths": {
+      "overall_auc": 0.5391,
+      "overall_acc": 0.5254,
+      "threshold": 0.5,
+      "best_generator": {
+        "name": "whichfaceisreal",
+        "auc": 0.6017
+      },
+      "worst_generator": {
+        "name": "seeingdark",
+        "auc": 0.4999
+      },
+      "results_file": "experiments/cross_benchmark/forensynths_balanced_results.json"
+    }
+  },
+  "prnu_validation": {
+    "status": "COMPLETE",
+    "timestamp": "2026-06-08T20:42:41Z",
+    "results_file": "experiments/prnu_ncc_discriminability.json",
+    "method": "PRNU NCC discriminability test \u2014 Pearson correlation between RAISE-1k D7000 TIFF fingerprint (10 images, 256x256 centre-crop) and DnCNN noise residuals of 100 real COCO + 100 fake SD1.5 + 50 fake StyleGAN3",
+    "fingerprint": {
+      "source": "RAISE-1k Nikon D7000 TIFFs",
+      "n_images": 10,
+      "crop_size": [
+        256,
+        256
+      ]
+    },
+    "ncc_results": {
+      "real_coco": {
+        "mean": 0.1826,
+        "std": 0.153,
+        "n": 100
+      },
+      "fake_sd15": {
+        "mean": 0.2161,
+        "std": 0.165,
+        "n": 100
+      },
+      "fake_sg3": {
+        "mean": 0.3114,
+        "std": 0.096,
+        "n": 50
+      }
+    },
+    "auc_real_vs_fake": 0.379,
+    "ncc_gap_real_minus_fake": -0.065,
+    "verdict": "NO_SIGNAL",
+    "finding": "AUC=0.379 \u2014 below random, direction reversed. Fake images (especially StyleGAN3, mean NCC=0.311) correlate MORE with the D7000 fingerprint than real COCO images (mean NCC=0.183). This is the opposite of PRNU theory expectations.",
+    "explanation": {
+      "real_images": "COCO images come from diverse internet cameras (not D7000) \u2014 low, variable NCC with D7000 fingerprint (expected).",
+      "stylegan3_anomaly": "StyleGAN3 has highest NCC (0.311 > 0.183 real). StyleGAN3 structured spectral patterns spuriously correlate with camera fingerprint extracted via DnCNN. DnCNN trained on Gaussian noise does not correctly isolate camera PRNU from GAN spectral artifacts.",
+      "dncnn_limitation": "DnCNN was trained for blind Gaussian denoising, not PRNU extraction. Its 'noise residuals' for GAN images capture GAN-specific periodic artifacts rather than true sensor noise, causing reversed correlation.",
+      "cross_camera_problem": "PRNU theory requires test images to come from the same camera as the reference fingerprint. COCO test images do not come from D7000 cameras \u2014 the method is inapplicable without per-camera reference images."
+    },
+    "thesis_significance": "This empirically validates the decision to exclude the PRNU stream (F1) from the best model. The ablation finding (F1 alone: AUC=0.500; F1+F2: AUC=0.599 vs F2 alone: 0.603; F1+F3: 0.620 vs F3 alone: 0.624) is now explained by the NCC test: PRNU features carry anti-correlated noise that the fusion head cannot usefully exploit. Stream 1 is correctly excluded from the final architecture.",
+    "recommendation": "DO NOT add Stream 1 to production model. Document as a validated negative result with mechanistic explanation for thesis."
+  },
+  "three_stream_trained_prnu_model": {
+    "status": "COMPLETE",
+    "checkpoint": "models/checkpoints/streams_123_trained_prnu_best.pth",
+    "features_dir": "features_new_3stream",
+    "streams": "F1(PRNU,128) + F2(FFT,256) + F3(NSS,64) = 448-dim",
+    "training": {
+      "n_total": 80058,
+      "n_real": 63558,
+      "n_fake": 16500,
+      "epochs_run": 50,
+      "best_epoch": 47,
+      "weighted_sampler": true,
+      "prnu_encoder_auc": 0.8094
+    },
+    "performance": {
+      "test_auc": 0.9685,
+      "test_acc": 0.9115,
+      "test_ap": 0.9084,
+      "full_set_auc": 0.9789,
+      "threshold_calibration": {
+        "method": "Youden J on full 80,058 features",
+        "optimal_threshold": 0.4587,
+        "at_optimal": {
+          "TPR": 0.9368,
+          "TNR": 0.9224,
+          "balanced_acc": 0.9296
+        }
+      }
+    },
+    "vs_best_2stream_model": {
+      "model": "streams_23_balanced_best.pth",
+      "test_auc": "+0.0760 (0.8925 -> 0.9685)",
+      "test_acc": "+0.1117 (0.7998 -> 0.9115)",
+      "full_set_auc": "+0.0865 (0.8924 -> 0.9789)"
+    },
+    "per_generator_fresh": {
+      "source": "streams_123_per_generator_20260610_100210.json",
+      "n_samples": 1500,
+      "overall": {
+        "auc": 0.9905,
+        "acc": 0.9567,
+        "ap": 0.9954
+      },
+      "threshold": 0.4587,
+      "per_generator": {
+        "real": {
+          "n": 500,
+          "acc": 0.946,
+          "note": "TNR=94.6% (false positive rate 5.4%)"
+        },
+        "stable_diffusion": {
+          "n": 500,
+          "acc": 0.924,
+          "note": "SD1.5 TPR=92.4%"
+        },
+        "stylegan3": {
+          "n": 500,
+          "acc": 1.0,
+          "note": "StyleGAN3 TPR=100% - GAN spectral artifacts strongly detected"
+        }
+      },
+      "vs_2stream_balanced": {
+        "real_acc": "+13.4pp (0.812 -> 0.946)",
+        "sd_acc": "+11.2pp (0.812 -> 0.924)",
+        "stylegan3_acc": "+2.2pp (0.978 -> 1.000)",
+        "overall_auc": "+0.0608 (0.9297 -> 0.9905)"
+      }
+    },
+    "cross_benchmark": {
+      "forensynths": {
+        "source": "forensynths_3stream_results.json",
+        "overall_auc": 0.5217,
+        "overall_acc": 0.5038,
+        "overall_ap": 0.5063,
+        "threshold": 0.4587,
+        "n_generators": 12,
+        "n_generators_note": "seeingdark excluded (4256x2848 PNG, 14MB/image, takes 5+ hours)",
+        "n_total": 2400,
+        "best_generator": {
+          "name": "imle",
+          "auc": 0.7082
+        },
+        "worst_generator": {
+          "name": "stylegan2",
+          "auc": 0.4263
+        },
+        "per_generator": {
+          "biggan": {
+            "auc": 0.495,
+            "acc": 0.495,
+            "tpr": 0.6,
+            "tnr": 0.39
+          },
+          "crn": {
+            "auc": 0.5684,
+            "acc": 0.47,
+            "tpr": 0.11,
+            "tnr": 0.83
+          },
+          "cyclegan": {
+            "auc": 0.4527,
+            "acc": 0.47,
+            "tpr": 0.61,
+            "tnr": 0.33
+          },
+          "deepfake": {
+            "auc": 0.5904,
+            "acc": 0.49,
+            "tpr": 0.79,
+            "tnr": 0.19
+          },
+          "gaugan": {
+            "auc": 0.4996,
+            "acc": 0.475,
+            "tpr": 0.4,
+            "tnr": 0.55
+          },
+          "imle": {
+            "auc": 0.7082,
+            "acc": 0.59,
+            "tpr": 0.23,
+            "tnr": 0.95
+          },
+          "progan": {
+            "auc": 0.4951,
+            "acc": 0.5,
+            "tpr": 0.46,
+            "tnr": 0.54
+          },
+          "san": {
+            "auc": 0.6197,
+            "acc": 0.61,
+            "tpr": 0.49,
+            "tnr": 0.73
+          },
+          "stargan": {
+            "auc": 0.4625,
+            "acc": 0.475,
+            "tpr": 0.58,
+            "tnr": 0.37
+          },
+          "stylegan": {
+            "auc": 0.5712,
+            "acc": 0.535,
+            "tpr": 0.44,
+            "tnr": 0.63
+          },
+          "stylegan2": {
+            "auc": 0.4263,
+            "acc": 0.435,
+            "tpr": 0.24,
+            "tnr": 0.63
+          },
+          "whichfaceisreal": {
+            "auc": 0.4506,
+            "acc": 0.5,
+            "tpr": 0.86,
+            "tnr": 0.14
+          }
+        },
+        "vs_2stream_balanced": {
+          "overall_auc": "-0.0174 (0.5391 -> 0.5217)",
+          "note": "3-stream worse on cross-gen ForenSynths but +7.6pp in-distribution AUC. PRNU features may negatively affect some GAN types."
+        }
+      },
+      "cnnspot_small": {
+        "source": "cross_bench_marco-willi_cnnspot-small_20260610_105514.json",
+        "n_samples": 2200,
+        "n_per_source": 50,
+        "overall_auc": 0.553,
+        "overall_acc": 0.5436,
+        "overall_ap": 0.506,
+        "best_source": {
+          "name": "san",
+          "auc": 0.6888
+        },
+        "worst_source": {
+          "name": "stargan",
+          "auc": 0.466
+        },
+        "per_source": {
+          "biggan": {
+            "n": 100,
+            "auc": 0.5484,
+            "acc": 0.53
+          },
+          "crn": {
+            "n": 100,
+            "auc": 0.5408,
+            "acc": 0.51
+          },
+          "cyclegan": {
+            "n": 100,
+            "auc": 0.482,
+            "acc": 0.54
+          },
+          "dalle": {
+            "n": 100,
+            "auc": 0.4812,
+            "acc": 0.48
+          },
+          "deepfake": {
+            "n": 100,
+            "auc": 0.6288,
+            "acc": 0.57
+          },
+          "gaugan": {
+            "n": 100,
+            "auc": 0.5788,
+            "acc": 0.57
+          },
+          "glide_100_10": {
+            "n": 100,
+            "auc": 0.6216,
+            "acc": 0.61
+          },
+          "glide_100_27": {
+            "n": 100,
+            "auc": 0.5752,
+            "acc": 0.59
+          },
+          "glide_50_27": {
+            "n": 100,
+            "auc": 0.5396,
+            "acc": 0.53
+          },
+          "guided": {
+            "n": 100,
+            "auc": 0.632,
+            "acc": 0.58
+          },
+          "imagenet": {
+            "n": 50,
+            "auc": null,
+            "acc": 0.66
+          },
+          "imle": {
+            "n": 100,
+            "auc": 0.6532,
+            "acc": 0.53
+          },
+          "laion": {
+            "n": 50,
+            "auc": null,
+            "acc": 0.54
+          },
+          "ldm_100": {
+            "n": 100,
+            "auc": 0.5264,
+            "acc": 0.51
+          },
+          "ldm_200": {
+            "n": 100,
+            "auc": 0.4704,
+            "acc": 0.49
+          },
+          "ldm_200_cfg": {
+            "n": 100,
+            "auc": 0.638,
+            "acc": 0.6
+          },
+          "progan": {
+            "n": 100,
+            "auc": 0.4976,
+            "acc": 0.5
+          },
+          "san": {
+            "n": 100,
+            "auc": 0.6888,
+            "acc": 0.65
+          },
+          "seeingdark": {
+            "n": 100,
+            "auc": 0.5076,
+            "acc": 0.54
+          },
+          "stargan": {
+            "n": 100,
+            "auc": 0.466,
+            "acc": 0.45
+          },
+          "stylegan": {
+            "n": 100,
+            "auc": 0.464,
+            "acc": 0.49
+          },
+          "stylegan2": {
+            "n": 100,
+            "auc": 0.5432,
+            "acc": 0.52
+          },
+          "whichfaceisreal": {
+            "n": 100,
+            "auc": 0.4784,
+            "acc": 0.57
+          }
+        },
+        "vs_balanced": {
+          "auc_delta": -0.0128,
+          "acc_delta": -0.0075,
+          "note": "3-stream -1.28pp AUC vs balanced 2-stream on CNNSpot"
+        }
+      }
+    },
+    "robustness": {
+      "source": "robustness_streams_123_20260610_102611.json",
+      "baseline_clean_auc": 0.9828,
+      "baseline_clean_acc": 0.935,
+      "jpeg": {
+        "q95_auc": 0.9815,
+        "q95_drop": 0.0013,
+        "q75_auc": 0.9809,
+        "q75_drop": 0.0019,
+        "q50_auc": 0.9774,
+        "q50_drop": 0.0054,
+        "q30_auc": 0.9728,
+        "q30_drop": 0.0099
+      },
+      "blur": {
+        "sigma1_auc": 0.9282,
+        "sigma1_drop": 0.0546,
+        "sigma2_auc": 0.8296,
+        "sigma2_drop": 0.1531,
+        "sigma3_auc": 0.7134,
+        "sigma3_drop": 0.2693,
+        "sigma4_auc": 0.6195,
+        "sigma4_drop": 0.3633
+      },
+      "resize": {
+        "x0_5_auc": 0.949,
+        "x0_5_drop": 0.0338,
+        "x0_75_auc": 0.9712,
+        "x0_75_drop": 0.0116,
+        "x1_5_auc": 0.9812,
+        "x1_5_drop": 0.0015
+      },
+      "vs_2stream_balanced": {
+        "clean": "+8.3pp (0.900 -> 0.9828)",
+        "jpeg_q30": "+7.7pp (0.896 -> 0.9728)",
+        "blur_sigma4": "+10.5pp (0.515 -> 0.6195)",
+        "resize_0_5x": "+8.4pp (0.865 -> 0.9490)",
+        "note": "3-stream significantly more robust across all perturbation types"
+      }
+    },
+    "result_files": {
+      "training": "experiments/streams_123_training.json",
+      "per_generator": "experiments/ablation/streams_123_per_generator_*.json",
+      "forensynths": "experiments/cross_benchmark/forensynths_3stream_results.json",
+      "robustness": "experiments/robustness/robustness_streams_123_*.json"
+    }
+  },
+  "best_model": {
+    "checkpoint": "streams_123_trained_prnu_best.pth",
+    "test_auc": 0.9685,
+    "test_acc": 0.9115,
+    "streams": "123",
+    "threshold": 0.4587,
+    "note": "Three-stream fusion (F1+F2+F3). +7.60pp AUC vs best 2-stream model.",
+    "forensynths_auc": 0.5217,
+    "cnnspot_small_auc": 0.553
+  }
+}
