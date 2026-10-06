@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+venv/
+.venv/
+env/
+
+# Secrets and local settings
+.env
+kaggle.json
+*.pem
+*.key
+
+# AI assistant and editor files
+AGENTS.md
+SESSION_INSTRUCTIONS.md
+PROJECT_STATUS.md
+.cursor/
+.cursorrules
+.vscode/
+
+# Large or private data
+/data/
+/datasets/
+*.zip
+*.rar
+
+# Project specific
+features*/
+*.npy
+runs/
+wandb/
+*.pdf
